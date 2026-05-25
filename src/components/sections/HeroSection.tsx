@@ -1,141 +1,243 @@
-import React, { useEffect, useRef } from "react";
 import gsap from "gsap";
-import * as THREE from "three";
+import { useLayoutEffect, useRef, useState, type CSSProperties } from "react";
+import { useTheme } from "../../context/ThemeContext";
+import { HeroEasterEggDot } from "../motion/HeroEasterEggDot";
+import { HeroParticleBackground } from "../motion/HeroParticleBackground";
+import { SkeletonPeeker } from "../motion/SkeletonPeeker";
+import { HERO_STATS } from "../../data/portfolioContent";
+import type { HeroStat } from "../../types/portfolio";
+import { MOTION_EASE, prefersReducedMotion } from "../../utils/motion";
 
-const HeroSection = () => {
-  const containerRef = useRef(null);
-  const canvasRef = useRef(null);
+type HeroSiteSettings = {
+  heroEyebrow?: string;
+  heroBody?: string;
+  heroStats?: HeroStat[];
+};
 
-  useEffect(() => {
-    // --- WEBGL BACKGROUND (Monopo Style) ---
-    const scene = new THREE.Scene();
-    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-    const renderer = new THREE.WebGLRenderer({
-      canvas: canvasRef.current,
-      alpha: true,
-    });
-    renderer.setSize(window.innerWidth, window.innerHeight);
+type HeroSectionProps = {
+  siteSettings?: HeroSiteSettings;
+  loading?: boolean;
+};
 
-    // Fragment Shader for the "Lava/Liquid" effect
-    const fragmentShader = `
-      uniform float uTime;
-      uniform vec2 uMouse;
-      uniform vec2 uResolution;
+export function HeroSection({ siteSettings, loading }: HeroSectionProps) {
+  const { theme } = useTheme();
+  const [skeletonPeek, setSkeletonPeek] = useState(false);
+  const lightEasterEgg = theme === "light";
 
-      void main() {
-        vec2 uv = gl_FragCoord.xy / uResolution.xy;
-        float ratio = uResolution.x / uResolution.y;
-        uv.x *= ratio;
+  const eyebrow =
+    siteSettings?.heroEyebrow ?? "front-end developer · jakarta, id";
+  const body =
+    siteSettings?.heroBody ??
+    "I craft fast, accessible, and thoughtfully designed web experiences — turning complex problems into clean, intuitive products.";
+  const stats = siteSettings?.heroStats ?? HERO_STATS;
+  const rootRef = useRef<HTMLElement>(null);
 
-        // Create organic moving noise
-        vec2 p = uv * 3.0;
-        float noise = 0.0;
-        for(float i = 1.0; i < 4.0; i++) {
-          p += vec2(0.7 / i * sin(i * p.y + uTime + 0.3 * i) + 0.8, 0.4 / i * sin(i * p.x + uTime + 0.3 * i) + 1.6);
-          noise += 0.5 / i * length(vec2(1.0 / i * sin(i * p.x), 1.0 / i * sin(i * p.y)));
-        }
+  useLayoutEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
 
-        // Mouse interaction
-        float mouseDist = length(uv - uMouse * vec2(ratio, 1.0));
-        noise -= Math.exp(-mouseDist * 5.0) * 0.2;
+    const eyebrowLine = root.querySelector(".hero-eyebrow-line");
+    const eyebrowText = root.querySelector(".hero-eyebrow-text");
+    const title = root.querySelector(".hero-title");
+    const titleAccent = root.querySelector(".hero-title-accent");
+    const body = root.querySelector(".hero-body");
+    const ctaItems = root.querySelectorAll(".hero-cta > *");
+    const statItems = root.querySelectorAll(".hero-stat");
 
-        // Monopo Color Palette (Deep blacks, blues, and vibrant accents)
-        vec3 color1 = vec3(0.05, 0.05, 0.1); // Dark Navy
-        vec3 color2 = vec3(0.4, 0.1, 0.9);   // Electric Purple
-        vec3 color3 = vec3(0.1, 0.8, 0.9);   // Cyan
-        
-        vec3 finalColor = mix(color1, color2, noise);
-        finalColor = mix(finalColor, color3, pow(noise, 3.0));
+    if (prefersReducedMotion()) {
+      gsap.set(
+        [
+          eyebrowLine,
+          eyebrowText,
+          title,
+          titleAccent,
+          body,
+          ...ctaItems,
+          ...statItems,
+        ].filter(Boolean),
+        { autoAlpha: 1, x: 0, y: 0, scaleX: 1, scale: 1 },
+      );
+      return;
+    }
 
-        gl_FragColor = vec4(finalColor, 1.0);
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({ defaults: { ease: MOTION_EASE.smooth } });
+
+      if (eyebrowLine) {
+        gsap.set(eyebrowLine, { scaleX: 0, transformOrigin: "left center" });
+        tl.to(eyebrowLine, {
+          scaleX: 1,
+          duration: 0.7,
+          ease: MOTION_EASE.editorial,
+        });
       }
-    `;
 
-    const geometry = new THREE.PlaneGeometry(2, 2);
-    const uniforms = {
-      uTime: { value: 0 },
-      uMouse: { value: new THREE.Vector2(0.5, 0.5) },
-      uResolution: {
-        value: new THREE.Vector2(window.innerWidth, window.innerHeight),
-      },
-    };
-    const material = new THREE.ShaderMaterial({
-      uniforms,
-      fragmentShader,
-    });
-    const mesh = new THREE.Mesh(geometry, material);
-    scene.add(mesh);
+      if (eyebrowText) {
+        gsap.set(eyebrowText, { autoAlpha: 0, x: -6 });
+        tl.to(
+          eyebrowText,
+          { autoAlpha: 1, x: 0, duration: 0.55, ease: MOTION_EASE.editorial },
+          "-=0.35",
+        );
+      }
 
-    // Animation Loop
-    const animate = (time) => {
-      uniforms.uTime.value = time * 0.0005;
-      renderer.render(scene, camera);
-      requestAnimationFrame(animate);
-    };
-    requestAnimationFrame(animate);
+      if (title) {
+        gsap.set(title, { autoAlpha: 0, y: 20 });
+        tl.to(
+          title,
+          { autoAlpha: 1, y: 0, duration: 0.85, ease: MOTION_EASE.editorial },
+          "-=0.2",
+        );
+      }
 
-    // Mouse Tracking
-    const handleMouseMove = (e) => {
-      gsap.to(uniforms.uMouse.value, {
-        x: e.clientX / window.innerWidth,
-        y: 1 - e.clientY / window.innerHeight,
-        duration: 0.8,
-      });
-    };
-    window.addEventListener("mousemove", handleMouseMove);
+      if (titleAccent) {
+        gsap.set(titleAccent, { autoAlpha: 0, y: 6 });
+        tl.to(
+          titleAccent,
+          {
+            autoAlpha: 1,
+            y: 0,
+            duration: 0.65,
+            ease: MOTION_EASE.soft,
+          },
+          "-=0.55",
+        );
+      }
 
-    // --- TYPOGRAPHY ANIMATION ---
-    const tl = gsap.timeline({ delay: 0.5 });
-    tl.from(".hero-title", {
-      y: 100,
-      opacity: 0,
-      duration: 1.2,
-      ease: "power4.out",
-    })
-      .from(
-        ".name-stack",
-        { y: 40, opacity: 0, duration: 1, ease: "power3.out" },
-        "-=0.8",
-      )
-      .from(".nav-links", { opacity: 0, duration: 1 }, "-=0.5");
+      if (body) {
+        gsap.set(body, { autoAlpha: 0, y: 14 });
+        tl.to(body, { autoAlpha: 1, y: 0, duration: 0.7 }, "-=0.45");
+      }
 
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      renderer.dispose();
-    };
+      if (ctaItems.length) {
+        gsap.set(ctaItems, { autoAlpha: 0, y: 10, x: -4 });
+        tl.to(
+          ctaItems,
+          {
+            autoAlpha: 1,
+            y: 0,
+            x: 0,
+            duration: 0.6,
+            stagger: 0.1,
+            ease: MOTION_EASE.editorial,
+          },
+          "-=0.35",
+        );
+      }
+
+      if (statItems.length) {
+        gsap.set(statItems, { autoAlpha: 0, y: 12 });
+        tl.to(
+          statItems,
+          {
+            autoAlpha: 1,
+            y: 0,
+            duration: 0.65,
+            stagger: 0.09,
+            ease: MOTION_EASE.smooth,
+          },
+          "-=0.25",
+        );
+      }
+
+      const statsLine = root.querySelector(".hero-stats-line");
+      if (statsLine) {
+        gsap.set(statsLine, { scaleX: 0, transformOrigin: "left center" });
+        tl.to(
+          statsLine,
+          { scaleX: 1, duration: 0.85, ease: MOTION_EASE.editorial },
+          "-=0.55",
+        );
+      }
+    }, root);
+
+    return () => ctx.revert();
   }, []);
 
   return (
-    <section className="relative w-full h-screen overflow-hidden bg-black flex items-center justify-center">
-      {/* WebGL Canvas */}
-      <canvas ref={canvasRef} className="absolute inset-0 z-0" />
+    <div className="relative w-full overflow-hidden">
+      <HeroParticleBackground />
+      <section
+        ref={rootRef}
+        className="relative z-10 max-w-[860px] mx-auto px-8 pt-28 pb-24"
+      >
+        <div className="hero-eyebrow flex items-center gap-2 mb-6">
+          <span className="hero-eyebrow-line block w-6 h-px bg-[#6b6b6b] dark:bg-[#9a9890]" />
+          <span className="hero-eyebrow-text font-mono text-[11px] tracking-[0.12em] uppercase text-[#6b6b6b] dark:text-[#9a9890]">
+            {eyebrow}
+          </span>
+        </div>
 
-      {/* Content */}
-      <div className="relative z-10 text-center text-white select-none">
-        <h1 className="hero-title text-6xl md:text-8xl font-bold tracking-tighter mb-20 italic">
-          Precision Over Noise.
+        <h1 className="hero-title font-serif text-[clamp(2.8rem,6vw,4.2rem)] font-normal leading-[1.1] tracking-tight text-[#0f0f0f] dark:text-[#f0efe8] mb-6">
+          Building interfaces
+          <br />
+          that{" "}
+          <em className="hero-title-accent italic text-[#6b6b6b] dark:text-[#9a9890]">
+            feel
+          </em>{" "}
+          right.
         </h1>
 
-        <div className="name-stack flex flex-col items-center">
-          <span className="text-xs md:text-sm uppercase tracking-[0.5em] text-cyan-400 font-medium mb-2">
-            Creative Developer
-          </span>
-          <h2 className="text-4xl md:text-7xl font-light tracking-tight">
-            KELVIN <span className="font-black">SUKHIRAJA</span>
-          </h2>
+        <p
+          className={`hero-body text-[16px] font-light text-[#6b6b6b] dark:text-[#9a9890] max-w-[480px] leading-[1.75] mb-10 transition-opacity duration-300 ${loading ? "opacity-60" : ""}`}
+        >
+          {body}
+        </p>
+
+        <div className="hero-cta flex items-center gap-4">
+          <a
+            href="#projects"
+            className="bg-[#0f0f0f] dark:bg-[#f0efe8] text-[#fafaf8] dark:text-[#0f0f0f] px-6 py-2.5 rounded-full text-[13px] font-medium tracking-wide transition-opacity hover:opacity-75 no-underline"
+          >
+            View my work
+          </a>
+          <a
+            href="#contact"
+            className="flex items-center gap-1.5 text-[13px] text-[#6b6b6b] dark:text-[#9a9890] hover:text-[#0f0f0f] dark:hover:text-[#f0efe8] transition-colors no-underline"
+          >
+            Get in touch
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden
+            >
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </a>
         </div>
 
-        <div className="nav-links mt-12 flex gap-8 justify-center text-sm uppercase tracking-widest opacity-60">
-          <a href="#projects" className="hover:text-cyan-400 transition-colors">
-            Projects
-          </a>
-          <a href="#contact" className="hover:text-cyan-400 transition-colors">
-            Contact
-          </a>
+        <div className="hero-stats-row relative mt-14 pt-8 flex gap-12">
+          <span
+            className="hero-stats-line absolute top-0 left-0 right-0 block h-px bg-[#e2e1da] dark:bg-[#2a2927] origin-left"
+            style={{ transformOrigin: "left center" } as CSSProperties}
+          />
+          {stats.map(({ value, label }) => (
+            <div key={label} className="hero-stat">
+              <div className="font-serif text-[2rem] leading-none text-[#0f0f0f] dark:text-[#f0efe8]">
+                {value}
+              </div>
+              <div className="font-mono text-[11px] tracking-[0.05em] text-[#6b6b6b] dark:text-[#9a9890] mt-1">
+                {label}
+              </div>
+            </div>
+          ))}
         </div>
-      </div>
-    </section>
+      </section>
+      {lightEasterEgg && (
+        <>
+          <HeroEasterEggDot
+            active={skeletonPeek}
+            onToggle={() => setSkeletonPeek((v) => !v)}
+          />
+          <SkeletonPeeker visible={skeletonPeek} />
+        </>
+      )}
+    </div>
   );
-};
-
-export default HeroSection;
+}

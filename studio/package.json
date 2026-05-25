@@ -1,0 +1,23 @@
+{
+  "name": "portfolio-2026-studio",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "sanity dev",
+    "build": "sanity build",
+    "deploy": "sanity deploy",
+    "schema:deploy": "sanity schema deploy"
+  },
+  "dependencies": {
+    "@sanity/icons": "^3.7.4",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "sanity": "^4.2.0",
+    "styled-components": "^6.1.19"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.7",
+    "typescript": "^5.9.3"
+  }
+}

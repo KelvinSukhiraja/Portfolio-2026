@@ -1,23 +1,33 @@
+import { Footer } from "./components/layout/Footer";
 import { Navbar } from "./components/layout/Navbar";
-import { AboutSection } from "./components/sections/AboutSection";
+import { SiteLayout } from "./components/layout/SiteLayout";
+import { GhostyRunner } from "./components/motion/GhostyRunner";
 import { ContactSection } from "./components/sections/ContactSection";
+import { ExperienceSection } from "./components/sections/ExperienceSection";
 import { HeroSection } from "./components/sections/HeroSection";
 import { ProjectsSection } from "./components/sections/ProjectsSection";
-import { navItems, projectItems } from "./data/portfolioContent";
+import { usePortfolioContent } from "./hooks/usePortfolioContent";
 
-function App() {
+export default function App() {
+  const { content, loading } = usePortfolioContent();
+
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <Navbar brand="Kelvin" items={navItems} />
-
+    <SiteLayout>
+      <Navbar />
       <main>
-        <HeroSection />
-        <ProjectsSection projects={projectItems} />
-        <AboutSection />
-        <ContactSection email="hello@example.com" />
+        <HeroSection
+          siteSettings={content?.siteSettings}
+          loading={loading}
+        />
+        <ProjectsSection projects={content?.projects} />
+        <ExperienceSection
+          experience={content?.experience}
+          education={content?.education}
+        />
+        <ContactSection />
       </main>
-    </div>
+      <Footer copyright={content?.siteSettings.copyright} />
+      <GhostyRunner />
+    </SiteLayout>
   );
 }
-
-export default App;
