@@ -186,10 +186,13 @@ export const CONTACT_LINKS: ContactLink[] = [
 ];
 
 export const HERO_STATS: HeroStat[] = [
-  { value: "3+", label: "years exp" },
-  { value: "14", label: "projects" },
-  { value: "10+", label: "clients" },
+  { value: "React", label: "primary stack" },
+  { value: "Full-stack", label: "web + mobile" },
+  { value: "Figma → ship", label: "design to delivery" },
 ];
+
+export const OWNER_TIMEZONE = "Asia/Jakarta" as const;
+export const OWNER_TIMEZONE_OFFSET = "UTC+7" as const;
 
 export const SITE = {
   email: "kelvinsukhiraja2712@gmail.com",

@@ -9,19 +9,68 @@ interface Particle {
   homeY: number;
   radius: number;
   alpha: number;
+  baseAlpha: number;
+  homePhi?: number;
+  homeTheta?: number;
 }
+
+type SphereLayout = {
+  cx: number;
+  cy: number;
+  radius: number;
+};
 
 const CURSOR_RADIUS = 130;
 const CURSOR_STRENGTH = 14;
 const SPRING = 0.1;
+const SPHERE_ROTATION_SPEED = 0.0012;
 
-function particleColor(): string {
-  return document.documentElement.classList.contains("dark")
-    ? "rgba(255, 255, 255, 0.7)"
-    : "rgba(255, 255, 255, 0.85)";
+function isDarkMode(): boolean {
+  return document.documentElement.classList.contains("dark");
 }
 
-function createParticles(
+function particleColor(): string {
+  return isDarkMode()
+    ? "rgba(255, 255, 255, 0.7)"
+    : "rgba(15, 15, 15, 0.65)";
+}
+
+function getSphereLayout(width: number, height: number): SphereLayout {
+  return {
+    cx: width * 0.78,
+    cy: height * 0.36,
+    radius: Math.min(width, height) * 0.26,
+  };
+}
+
+function projectSpherePoint(
+  phi: number,
+  theta: number,
+  rotY: number,
+  layout: SphereLayout,
+): { x: number; y: number; depth: number } {
+  const sinPhi = Math.sin(phi);
+  const x3 = sinPhi * Math.cos(theta);
+  const y3 = sinPhi * Math.sin(theta);
+  const z3 = Math.cos(phi);
+
+  const cosR = Math.cos(rotY);
+  const sinR = Math.sin(rotY);
+  const xRot = x3 * cosR - z3 * sinR;
+  const zRot = x3 * sinR + z3 * cosR;
+
+  return {
+    x: layout.cx + xRot * layout.radius,
+    y: layout.cy + y3 * layout.radius,
+    depth: zRot,
+  };
+}
+
+function depthAlpha(depth: number): number {
+  return 0.3 + ((depth + 1) / 2) * 0.55;
+}
+
+function createFlatParticles(
   width: number,
   height: number,
   count: number,
@@ -29,15 +78,56 @@ function createParticles(
   return Array.from({ length: count }, () => {
     const x = gsap.utils.random(0, width);
     const y = gsap.utils.random(0, height);
+    const alpha = gsap.utils.random(0.25, 0.65);
     return {
       x,
       y,
       homeX: x,
       homeY: y,
       radius: gsap.utils.random(0.5, 1.8),
-      alpha: gsap.utils.random(0.25, 0.65),
+      alpha,
+      baseAlpha: alpha,
     };
   });
+}
+
+function createSphereParticles(
+  width: number,
+  height: number,
+  count: number,
+): Particle[] {
+  const layout = getSphereLayout(width, height);
+  const goldenRatio = (1 + Math.sqrt(5)) / 2;
+
+  return Array.from({ length: count }, (_, i) => {
+    const t = (i + 0.5) / count;
+    const phi = Math.acos(1 - 2 * t);
+    const theta = (2 * Math.PI * i) / goldenRatio;
+    const { x, y, depth } = projectSpherePoint(phi, theta, 0, layout);
+    const alpha = depthAlpha(depth) * gsap.utils.random(0.85, 1);
+
+    return {
+      x,
+      y,
+      homeX: x,
+      homeY: y,
+      homePhi: phi,
+      homeTheta: theta,
+      radius: gsap.utils.random(0.5, 1.8),
+      alpha,
+      baseAlpha: alpha,
+    };
+  });
+}
+
+function createParticles(
+  width: number,
+  height: number,
+  count: number,
+): Particle[] {
+  return isDarkMode()
+    ? createFlatParticles(width, height, count)
+    : createSphereParticles(width, height, count);
 }
 
 function drawParticles(
@@ -92,6 +182,7 @@ export function HeroParticleBackground({
     let cursorX = -9999;
     let cursorY = -9999;
     let cursorActive = false;
+    let sphereRotation = 0;
 
     const killTweens = () => {
       tweens.forEach((tween) => tween.kill());
@@ -119,9 +210,37 @@ export function HeroParticleBackground({
     };
 
     const updateFromCursor = () => {
+      const useSphere = !isDarkMode();
+      const layout = useSphere ? getSphereLayout(width, height) : null;
+
+      if (useSphere && !reducedMotion) {
+        sphereRotation += SPHERE_ROTATION_SPEED;
+      }
+
       for (const p of particles) {
-        let targetX = p.homeX;
-        let targetY = p.homeY;
+        let targetX: number;
+        let targetY: number;
+
+        if (
+          useSphere &&
+          layout &&
+          p.homePhi !== undefined &&
+          p.homeTheta !== undefined
+        ) {
+          const projected = projectSpherePoint(
+            p.homePhi,
+            p.homeTheta,
+            sphereRotation,
+            layout,
+          );
+          targetX = projected.x;
+          targetY = projected.y;
+          p.alpha = p.baseAlpha * depthAlpha(projected.depth);
+        } else {
+          targetX = p.homeX;
+          targetY = p.homeY;
+          p.alpha = p.baseAlpha;
+        }
 
         if (cursorActive) {
           const dx = p.x - cursorX;
@@ -136,8 +255,10 @@ export function HeroParticleBackground({
           }
         }
 
-        targetX = gsap.utils.clamp(0, width, targetX);
-        targetY = gsap.utils.clamp(0, height, targetY);
+        if (!useSphere) {
+          targetX = gsap.utils.clamp(0, width, targetX);
+          targetY = gsap.utils.clamp(0, height, targetY);
+        }
 
         p.x += (targetX - p.x) * SPRING;
         p.y += (targetY - p.y) * SPRING;
@@ -161,30 +282,53 @@ export function HeroParticleBackground({
       killTweens();
       if (reducedMotion || particles.length === 0) return;
 
-      for (const p of particles) {
-        const driftX =
-          gsap.utils.random(30, 80) * (Math.random() > 0.5 ? 1 : -1);
-        const driftY =
-          gsap.utils.random(30, 80) * (Math.random() > 0.5 ? 1 : -1);
+      const useSphere = !isDarkMode();
 
-        tweens.push(
-          gsap.fromTo(
-            p,
-            { homeX: p.homeX, homeY: p.homeY },
-            {
-              homeX: gsap.utils.clamp(0, width, p.homeX + driftX),
-              homeY: gsap.utils.clamp(0, height, p.homeY + driftY),
-              duration: gsap.utils.random(3.5, 7),
-              repeat: -1,
-              yoyo: true,
-              ease: "sine.inOut",
-            },
-          ),
-        );
+      for (const p of particles) {
+        if (useSphere && p.homePhi !== undefined && p.homeTheta !== undefined) {
+          tweens.push(
+            gsap.fromTo(
+              p,
+              { homePhi: p.homePhi, homeTheta: p.homeTheta },
+              {
+                homePhi: gsap.utils.clamp(
+                  0.12,
+                  Math.PI - 0.12,
+                  p.homePhi + gsap.utils.random(-0.06, 0.06),
+                ),
+                homeTheta: p.homeTheta + gsap.utils.random(-0.12, 0.12),
+                duration: gsap.utils.random(3.5, 7),
+                repeat: -1,
+                yoyo: true,
+                ease: "sine.inOut",
+              },
+            ),
+          );
+        } else {
+          const driftX =
+            gsap.utils.random(30, 80) * (Math.random() > 0.5 ? 1 : -1);
+          const driftY =
+            gsap.utils.random(30, 80) * (Math.random() > 0.5 ? 1 : -1);
+
+          tweens.push(
+            gsap.fromTo(
+              p,
+              { homeX: p.homeX, homeY: p.homeY },
+              {
+                homeX: gsap.utils.clamp(0, width, p.homeX + driftX),
+                homeY: gsap.utils.clamp(0, height, p.homeY + driftY),
+                duration: gsap.utils.random(3.5, 7),
+                repeat: -1,
+                yoyo: true,
+                ease: "sine.inOut",
+              },
+            ),
+          );
+        }
 
         tweens.push(
           gsap.to(p, {
-            alpha: gsap.utils.random(0.55, 1),
+            baseAlpha: gsap.utils.random(0.55, 1),
             duration: gsap.utils.random(1.8, 3.5),
             repeat: -1,
             yoyo: true,
@@ -198,6 +342,7 @@ export function HeroParticleBackground({
 
     const refresh = () => {
       if (!syncSize()) return;
+      sphereRotation = 0;
       particles = createParticles(width, height, count);
       render();
       gsap.ticker.remove(updateFromCursor);
@@ -214,7 +359,7 @@ export function HeroParticleBackground({
       interactionTarget.addEventListener("pointerleave", onPointerLeave);
     }
 
-    const onThemeChange = () => render();
+    const onThemeChange = () => refresh();
     const themeObserver = new MutationObserver(onThemeChange);
     themeObserver.observe(document.documentElement, {
       attributes: true,

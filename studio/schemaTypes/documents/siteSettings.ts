@@ -26,7 +26,9 @@ export const siteSettings = defineType({
     }),
     defineField({
       name: "heroStats",
-      title: "Hero stats",
+      title: "Hero focus areas",
+      description:
+        "Short focus labels shown in the hero (e.g. React · primary stack). Leave empty to use site defaults.",
       type: "array",
       of: [
         defineArrayMember({

@@ -86,6 +86,21 @@ const DEFAULT_SITE = {
   copyright: SITE.copyright,
 };
 
+const LEGACY_HERO_STAT_LABELS = new Set([
+  "years exp",
+  "projects",
+  "clients",
+]);
+
+/** Sanity may still store old vanity metrics; prefer local focus areas. */
+function resolveHeroStats(stats?: HeroStat[]): HeroStat[] {
+  if (!stats?.length) return HERO_STATS;
+  const hasLegacy = stats.some((s) =>
+    LEGACY_HERO_STAT_LABELS.has(s.label.trim().toLowerCase()),
+  );
+  return hasLegacy ? HERO_STATS : stats;
+}
+
 function mapSanityThumbnail(
   image: SanityProjectImage | null | undefined,
 ): ProjectImage | undefined {
@@ -202,9 +217,7 @@ export async function fetchPortfolioContent(): Promise<PortfolioContent> {
         heroEyebrow: settings?.heroEyebrow ?? DEFAULT_SITE.heroEyebrow,
         heroTitle: settings?.heroTitle ?? DEFAULT_SITE.heroTitle,
         heroBody: settings?.heroBody ?? DEFAULT_SITE.heroBody,
-        heroStats: settings?.heroStats?.length
-          ? settings.heroStats
-          : DEFAULT_SITE.heroStats,
+        heroStats: resolveHeroStats(settings?.heroStats),
         email: settings?.email ?? DEFAULT_SITE.email,
         copyright: settings?.copyright ?? DEFAULT_SITE.copyright,
       },

@@ -4,6 +4,8 @@ import { useTheme } from "../../context/ThemeContext";
 import { HeroEasterEggDot } from "../motion/HeroEasterEggDot";
 import { HeroParticleBackground } from "../motion/HeroParticleBackground";
 import { SkeletonPeeker } from "../motion/SkeletonPeeker";
+import { HeroFocusAreas } from "../hero/HeroFocusAreas";
+import { HeroTimezones } from "../hero/HeroTimezones";
 import { HERO_STATS } from "../../data/portfolioContent";
 import type { HeroStat } from "../../types/portfolio";
 import { MOTION_EASE, prefersReducedMotion } from "../../utils/motion";
@@ -42,7 +44,8 @@ export function HeroSection({ siteSettings, loading }: HeroSectionProps) {
     const titleAccent = root.querySelector(".hero-title-accent");
     const body = root.querySelector(".hero-body");
     const ctaItems = root.querySelectorAll(".hero-cta > *");
-    const statItems = root.querySelectorAll(".hero-stat");
+    const focusItems = root.querySelectorAll(".hero-focus");
+    const timezoneItems = root.querySelectorAll(".hero-timezone");
 
     if (prefersReducedMotion()) {
       gsap.set(
@@ -53,7 +56,8 @@ export function HeroSection({ siteSettings, loading }: HeroSectionProps) {
           titleAccent,
           body,
           ...ctaItems,
-          ...statItems,
+          ...focusItems,
+          ...timezoneItems,
         ].filter(Boolean),
         { autoAlpha: 1, x: 0, y: 0, scaleX: 1, scale: 1 },
       );
@@ -125,10 +129,10 @@ export function HeroSection({ siteSettings, loading }: HeroSectionProps) {
         );
       }
 
-      if (statItems.length) {
-        gsap.set(statItems, { autoAlpha: 0, y: 12 });
+      if (focusItems.length) {
+        gsap.set(focusItems, { autoAlpha: 0, y: 12 });
         tl.to(
-          statItems,
+          focusItems,
           {
             autoAlpha: 1,
             y: 0,
@@ -137,6 +141,21 @@ export function HeroSection({ siteSettings, loading }: HeroSectionProps) {
             ease: MOTION_EASE.smooth,
           },
           "-=0.25",
+        );
+      }
+
+      if (timezoneItems.length) {
+        gsap.set(timezoneItems, { autoAlpha: 0, y: 12 });
+        tl.to(
+          timezoneItems,
+          {
+            autoAlpha: 1,
+            y: 0,
+            duration: 0.65,
+            stagger: 0.09,
+            ease: MOTION_EASE.smooth,
+          },
+          "-=0.45",
         );
       }
 
@@ -212,21 +231,15 @@ export function HeroSection({ siteSettings, loading }: HeroSectionProps) {
           </a>
         </div>
 
-        <div className="hero-stats-row relative mt-10 sm:mt-14 pt-6 sm:pt-8 grid grid-cols-2 gap-x-6 gap-y-8 sm:flex sm:gap-12">
+        <div className="hero-meta-row relative mt-10 sm:mt-14 pt-6 sm:pt-8">
           <span
             className="hero-stats-line absolute top-0 left-0 right-0 block h-px bg-[#e2e1da] dark:bg-[#2a2927] origin-left"
             style={{ transformOrigin: "left center" } as CSSProperties}
           />
-          {stats.map(({ value, label }) => (
-            <div key={label} className="hero-stat">
-              <div className="font-serif text-[1.65rem] sm:text-[2rem] leading-none text-[#0f0f0f] dark:text-[#f0efe8]">
-                {value}
-              </div>
-              <div className="font-mono text-[11px] tracking-[0.05em] text-[#6b6b6b] dark:text-[#9a9890] mt-1">
-                {label}
-              </div>
-            </div>
-          ))}
+          <div className="flex flex-col gap-8 sm:flex-row sm:items-end md:items-start sm:justify-between sm:gap-6">
+            <HeroFocusAreas items={stats} />
+            <HeroTimezones />
+          </div>
         </div>
       </section>
       {lightEasterEgg && (
