@@ -15,7 +15,7 @@ export function ExperienceSection({
   return (
     <AnimatedSection
       id="experience"
-      className="max-w-[860px] mx-auto px-8 py-20"
+      className="section-shell"
     >
       <div data-motion-reveal data-motion-variant="rise-soft">
         <SectionHeader number="02" title="Experience" />
@@ -29,9 +29,9 @@ export function ExperienceSection({
             data-motion-variant={index % 2 === 0 ? "fade-right" : "fade-left"}
           >
             <div
-              className={`grid gap-8 py-8 border-[#e2e1da] dark:border-[#2a2927]
+              className={`grid gap-3 sm:gap-6 md:gap-8 py-6 sm:py-8 border-[#e2e1da] dark:border-[#2a2927]
               ${index === 0 ? "border-t border-b" : "border-b"}
-              grid-cols-[140px_1fr]`}
+              grid-cols-1 md:grid-cols-[minmax(0,140px)_1fr]`}
             >
               <div className="font-mono text-[11px] tracking-[0.06em] text-[#6b6b6b] dark:text-[#9a9890] pt-0.5">
                 {item.period}
@@ -76,7 +76,7 @@ export function ExperienceSection({
             data-motion-reveal
             data-motion-variant={index % 2 === 0 ? "fade-right" : "fade-left"}
           >
-            <div className="grid gap-8 py-8 border-b border-[#e2e1da] dark:border-[#2a2927] grid-cols-[140px_1fr]">
+            <div className="grid gap-3 sm:gap-6 md:gap-8 py-6 sm:py-8 border-b border-[#e2e1da] dark:border-[#2a2927] grid-cols-1 md:grid-cols-[minmax(0,140px)_1fr]">
               <div className="font-mono text-[11px] tracking-[0.06em] text-[#6b6b6b] dark:text-[#9a9890] pt-0.5">
                 {item.period}
               </div>

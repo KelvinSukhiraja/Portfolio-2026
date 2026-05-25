@@ -45,7 +45,7 @@ export function ProjectsSection({ projects = PROJECTS }: ProjectsSectionProps) {
   const hiddenCount = sortedProjects.length - INITIAL_VISIBLE;
 
   return (
-    <AnimatedSection id="projects" className="max-w-[860px] mx-auto px-8 py-20">
+    <AnimatedSection id="projects" className="section-shell">
       <div data-motion-reveal data-motion-variant="rise-soft">
         <SectionHeader number="01" title="Projects" />
       </div>
@@ -70,12 +70,12 @@ export function ProjectsSection({ projects = PROJECTS }: ProjectsSectionProps) {
                   setSelectedProject(project);
                 }
               }}
-              className={`group flex gap-6 p-8 cursor-pointer transition-[background-color,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]
+              className={`group flex flex-col gap-4 p-4 sm:flex-row sm:gap-6 sm:p-6 md:p-8 cursor-pointer transition-[background-color,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]
                 bg-[#fafaf8] dark:bg-[#111110] hover:bg-[#f2f1ec] dark:hover:bg-[#1c1b19]
                 ${index < visibleProjects.length - 1 || hasMore ? "border-b border-[#e2e1da] dark:border-[#2a2927]" : ""}`}
             >
               {project.imageUrl && (
-                <div className="shrink-0 w-[140px] h-[88px] rounded-lg overflow-hidden border border-[#e2e1da] dark:border-[#2a2927] bg-[#ebebeb] dark:bg-[#242320]">
+                <div className="shrink-0 w-full sm:w-[140px] aspect-[16/10] sm:aspect-auto sm:h-[88px] rounded-lg overflow-hidden border border-[#e2e1da] dark:border-[#2a2927] bg-[#ebebeb] dark:bg-[#242320]">
                   <img
                     src={project.imageUrl}
                     alt={project.imageAlt ?? project.name}
@@ -87,8 +87,8 @@ export function ProjectsSection({ projects = PROJECTS }: ProjectsSectionProps) {
                   />
                 </div>
               )}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-3">
+              <div className="flex-1 min-w-0 w-full">
+                <div className="flex flex-wrap items-center gap-2 mb-2 sm:mb-3">
                   <span className="font-mono text-[11px] tracking-[0.08em] text-[#6b6b6b] dark:text-[#9a9890]">
                     {project.year}
                   </span>
@@ -96,7 +96,7 @@ export function ProjectsSection({ projects = PROJECTS }: ProjectsSectionProps) {
                     {project.type}
                   </span>
                 </div>
-                <div className="text-[16px] font-medium tracking-tight text-[#0f0f0f] dark:text-[#f0efe8] mb-2">
+                <div className="text-[15px] sm:text-[16px] font-medium tracking-tight text-[#0f0f0f] dark:text-[#f0efe8] mb-2">
                   {project.name}
                 </div>
                 <p className="text-[13px] font-light text-[#6b6b6b] dark:text-[#9a9890] leading-[1.65] mb-4">
@@ -118,9 +118,9 @@ export function ProjectsSection({ projects = PROJECTS }: ProjectsSectionProps) {
                   {...externalLinkProps(project.href)}
                   onClick={(event) => event.stopPropagation()}
                   onKeyDown={(event) => event.stopPropagation()}
-                  className="flex items-start pt-0.5 no-underline text-[#6b6b6b] dark:text-[#9a9890]
+                  className="flex shrink-0 items-center justify-center min-h-11 min-w-11 sm:items-start sm:justify-start sm:min-h-0 sm:min-w-0 sm:pt-0.5 -m-2 sm:m-0 p-2 sm:p-0 no-underline text-[#6b6b6b] dark:text-[#9a9890]
                     group-hover:text-[#0f0f0f] dark:group-hover:text-[#f0efe8] transition-all
-                    group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                    sm:group-hover:translate-x-0.5 sm:group-hover:-translate-y-0.5 self-end sm:self-auto"
                   aria-label={`Open ${project.name} website`}
                 >
                   <ExternalLinkIcon />
@@ -135,7 +135,7 @@ export function ProjectsSection({ projects = PROJECTS }: ProjectsSectionProps) {
             type="button"
             onClick={() => setExpanded((prev) => !prev)}
             aria-expanded={expanded}
-            className="w-full flex items-center justify-center gap-2 py-5 bg-[#fafaf8] dark:bg-[#111110] text-[13px] text-[#6b6b6b] dark:text-[#9a9890] hover:text-[#0f0f0f] dark:hover:text-[#f0efe8] hover:bg-[#f2f1ec] dark:hover:bg-[#1c1b19] transition-[color,background-color] duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer border-0"
+            className="w-full flex items-center justify-center gap-2 min-h-12 py-4 sm:py-5 bg-[#fafaf8] dark:bg-[#111110] text-[13px] text-[#6b6b6b] dark:text-[#9a9890] hover:text-[#0f0f0f] dark:hover:text-[#f0efe8] hover:bg-[#f2f1ec] dark:hover:bg-[#1c1b19] transition-[color,background-color] duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer border-0"
           >
             <span className="font-mono text-[11px] tracking-[0.08em] uppercase">
               {expanded

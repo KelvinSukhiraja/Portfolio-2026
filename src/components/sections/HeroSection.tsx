@@ -159,16 +159,16 @@ export function HeroSection({ siteSettings, loading }: HeroSectionProps) {
       <HeroParticleBackground />
       <section
         ref={rootRef}
-        className="relative z-10 max-w-[860px] mx-auto px-8 pt-28 pb-24"
+        className="section-shell relative z-10 !pt-20 sm:!pt-24 md:!pt-28 !pb-16 sm:!pb-20 md:!pb-24"
       >
         <div className="hero-eyebrow flex items-center gap-2 mb-6">
           <span className="hero-eyebrow-line block w-6 h-px bg-[#6b6b6b] dark:bg-[#9a9890]" />
-          <span className="hero-eyebrow-text font-mono text-[11px] tracking-[0.12em] uppercase text-[#6b6b6b] dark:text-[#9a9890]">
+          <span className="hero-eyebrow-text font-mono text-[10px] sm:text-[11px] tracking-[0.1em] sm:tracking-[0.12em] uppercase text-[#6b6b6b] dark:text-[#9a9890]">
             {eyebrow}
           </span>
         </div>
 
-        <h1 className="hero-title font-serif text-[clamp(2.8rem,6vw,4.2rem)] font-normal leading-[1.1] tracking-tight text-[#0f0f0f] dark:text-[#f0efe8] mb-6">
+        <h1 className="hero-title font-serif text-[clamp(2.25rem,9vw,4.2rem)] font-normal leading-[1.12] tracking-tight text-[#0f0f0f] dark:text-[#f0efe8] mb-5 sm:mb-6">
           Building interfaces
           <br />
           that{" "}
@@ -179,21 +179,21 @@ export function HeroSection({ siteSettings, loading }: HeroSectionProps) {
         </h1>
 
         <p
-          className={`hero-body text-[16px] font-light text-[#6b6b6b] dark:text-[#9a9890] max-w-[480px] leading-[1.75] mb-10 transition-opacity duration-300 ${loading ? "opacity-60" : ""}`}
+          className={`hero-body text-[15px] sm:text-[16px] font-light text-[#6b6b6b] dark:text-[#9a9890] max-w-[480px] leading-[1.75] mb-8 sm:mb-10 transition-opacity duration-300 ${loading ? "opacity-60" : ""}`}
         >
           {body}
         </p>
 
-        <div className="hero-cta flex items-center gap-4">
+        <div className="hero-cta flex flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
           <a
             href="#projects"
-            className="bg-[#0f0f0f] dark:bg-[#f0efe8] text-[#fafaf8] dark:text-[#0f0f0f] px-6 py-2.5 rounded-full text-[13px] font-medium tracking-wide transition-opacity hover:opacity-75 no-underline"
+            className="inline-flex min-h-11 items-center justify-center bg-[#0f0f0f] dark:bg-[#f0efe8] text-[#fafaf8] dark:text-[#0f0f0f] px-6 py-2.5 rounded-full text-[13px] font-medium tracking-wide transition-opacity hover:opacity-75 no-underline text-center"
           >
             View my work
           </a>
           <a
             href="#contact"
-            className="flex items-center gap-1.5 text-[13px] text-[#6b6b6b] dark:text-[#9a9890] hover:text-[#0f0f0f] dark:hover:text-[#f0efe8] transition-colors no-underline"
+            className="inline-flex min-h-11 items-center justify-center gap-1.5 text-[13px] text-[#6b6b6b] dark:text-[#9a9890] hover:text-[#0f0f0f] dark:hover:text-[#f0efe8] transition-colors no-underline"
           >
             Get in touch
             <svg
@@ -212,14 +212,14 @@ export function HeroSection({ siteSettings, loading }: HeroSectionProps) {
           </a>
         </div>
 
-        <div className="hero-stats-row relative mt-14 pt-8 flex gap-12">
+        <div className="hero-stats-row relative mt-10 sm:mt-14 pt-6 sm:pt-8 grid grid-cols-2 gap-x-6 gap-y-8 sm:flex sm:gap-12">
           <span
             className="hero-stats-line absolute top-0 left-0 right-0 block h-px bg-[#e2e1da] dark:bg-[#2a2927] origin-left"
             style={{ transformOrigin: "left center" } as CSSProperties}
           />
           {stats.map(({ value, label }) => (
             <div key={label} className="hero-stat">
-              <div className="font-serif text-[2rem] leading-none text-[#0f0f0f] dark:text-[#f0efe8]">
+              <div className="font-serif text-[1.65rem] sm:text-[2rem] leading-none text-[#0f0f0f] dark:text-[#f0efe8]">
                 {value}
               </div>
               <div className="font-mono text-[11px] tracking-[0.05em] text-[#6b6b6b] dark:text-[#9a9890] mt-1">

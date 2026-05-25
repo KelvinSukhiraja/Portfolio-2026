@@ -57,7 +57,7 @@ export function Footer({ copyright = SITE.copyright }: FooterProps) {
   return (
     <footer
       ref={footerRef}
-      className="max-w-[860px] mx-auto px-8 py-8 flex items-center justify-between border-t border-[#e2e1da] dark:border-[#2a2927]"
+      className="section-shell !py-6 sm:!py-8 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between border-t border-[#e2e1da] dark:border-[#2a2927]"
     >
       <div
         data-motion-reveal
@@ -68,7 +68,7 @@ export function Footer({ copyright = SITE.copyright }: FooterProps) {
           type="button"
           onClick={scrollToTop}
           aria-label="Back to top"
-          className="flex cursor-pointer items-center justify-center p-1 rounded-md text-[#6b6b6b] dark:text-[#9a9890] hover:text-[#0f0f0f] dark:hover:text-[#f0efe8] hover:bg-[#e8e7e0]/80 dark:hover:bg-[#2a2927]/80 transition-[color,background-color,transform] duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-px"
+          className="flex min-h-11 min-w-11 cursor-pointer items-center justify-center p-2 rounded-md text-[#6b6b6b] dark:text-[#9a9890] hover:text-[#0f0f0f] dark:hover:text-[#f0efe8] hover:bg-[#e8e7e0]/80 dark:hover:bg-[#2a2927]/80 transition-[color,background-color,transform] duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-px"
         >
           <svg
             width="18"
@@ -92,7 +92,7 @@ export function Footer({ copyright = SITE.copyright }: FooterProps) {
         className="flex items-center gap-5"
       >
         <ThemeToggle />
-        <span className="flex items-center gap-1.5 font-mono text-[11px] tracking-[0.04em] text-[#6b6b6b] dark:text-[#9a9890]">
+        <span className="hidden sm:flex items-center gap-1.5 font-mono text-[11px] tracking-[0.04em] text-[#6b6b6b] dark:text-[#9a9890]">
           <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
           available for work
         </span>

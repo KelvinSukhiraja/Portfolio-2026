@@ -8,10 +8,10 @@ export function HeroEasterEggDot({ active, onToggle }: HeroEasterEggDotProps) {
     <button
       type="button"
       onClick={onToggle}
-      className={`hero-easter-egg-dot group absolute z-20 flex items-center justify-center rounded-full border-0 bg-transparent p-3 transition-[transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f0f0f] ${
+      className={`hero-easter-egg-dot group absolute z-20 hidden sm:flex items-center justify-center rounded-full border-0 bg-transparent p-3 transition-[transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0f0f0f] ${
         active ? "scale-110" : "hover:scale-110"
       }`}
-      style={{ top: "22%", right: "max(6%, calc(50% - 430px))" }}
+      style={{ top: "18%", right: "max(1rem, env(safe-area-inset-right, 0px))" }}
       aria-label={active ? "Hide skeleton" : "?"}
       title=""
     >

@@ -60,7 +60,13 @@ export function ProjectModal({ project, onClose }: ProjectModalProps) {
           overflow-hidden"
         onClick={(event) => event.stopPropagation()}
       >
-        <div className="flex items-start justify-between gap-4 px-6 sm:px-8 pt-6 sm:pt-7 pb-4 border-b border-[#e2e1da] dark:border-[#2a2927] shrink-0">
+        <div
+          className="flex items-start justify-between gap-4 px-4 sm:px-8 pt-5 sm:pt-7 pb-4 border-b border-[#e2e1da] dark:border-[#2a2927] shrink-0"
+          style={{
+            paddingLeft: "max(1rem, env(safe-area-inset-left, 0px))",
+            paddingRight: "max(1rem, env(safe-area-inset-right, 0px))",
+          }}
+        >
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2 mb-2">
               <span className="font-mono text-[11px] tracking-[0.08em] text-[#6b6b6b] dark:text-[#9a9890]">
@@ -81,7 +87,7 @@ export function ProjectModal({ project, onClose }: ProjectModalProps) {
             ref={closeRef}
             type="button"
             onClick={onClose}
-            className="shrink-0 p-2 -m-2 rounded-lg text-[#6b6b6b] dark:text-[#9a9890]
+            className="shrink-0 min-h-11 min-w-11 flex items-center justify-center p-2 -m-2 rounded-lg text-[#6b6b6b] dark:text-[#9a9890]
               hover:text-[#0f0f0f] dark:hover:text-[#f0efe8] hover:bg-[#f2f1ec] dark:hover:bg-[#1c1b19]
               transition-colors cursor-pointer border-0 bg-transparent"
             aria-label="Close project details"
@@ -101,7 +107,13 @@ export function ProjectModal({ project, onClose }: ProjectModalProps) {
           </button>
         </div>
 
-        <div className="overflow-y-auto overscroll-contain px-6 sm:px-8 py-6 sm:py-7">
+        <div
+          className="overflow-y-auto overscroll-contain px-4 sm:px-8 py-5 sm:py-7 pb-[max(1.25rem,env(safe-area-inset-bottom,0px))]"
+          style={{
+            paddingLeft: "max(1rem, env(safe-area-inset-left, 0px))",
+            paddingRight: "max(1rem, env(safe-area-inset-right, 0px))",
+          }}
+        >
           <div
             className={
               gallery.length > 0
